@@ -1,0 +1,85 @@
+function setup() {
+  createCanvas(800, 400);
+  
+  player1 = new Player(20, height/2);
+  player2 = new Player(width - 20, height/2);
+  ball = new Ball(width/2, height/2);
+}
+
+function draw() {
+  background(0);
+  
+  player1.show();
+  player2.show();
+  ball.show();
+  ball.update();
+  
+  player1.update();
+  player2.update();
+  
+  ball.checkPlayerCollision(player1);
+  ball.checkPlayerCollision(player2);
+}
+
+class Player {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.width = 10;
+    this.height = 80;
+    this.speed = 5;
+  }
+  
+  show() {
+    rect(this.x, this.y - this.height/2, this.width, this.height);
+  }
+  
+  update() {
+    if (keyIsDown(UP_ARROW) && this.y > this.height/2) {
+      this.y -= this.speed;
+    } else if (keyIsDown(DOWN_ARROW) && this.y < height - this.height/2) {
+      this.y += this.speed;
+    }
+  }
+}
+
+class Ball {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 10;
+    this.xSpeed = random(2, 3) * (random() > 0.5 ? 1 : -1);
+    this.ySpeed = random(1, 2) * (random() > 0.5 ? 1 : -1);
+  }
+  
+  show() {
+    ellipse(this.x, this.y, this.radius*2);
+  }
+  
+  update() {
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    
+    if (this.y < 0 || this.y > height) {
+      this.ySpeed *= -1;
+    }
+    
+    if (this.x < player1.x + player1.width && this.y > player1.y - player1.height/2 && this.y < player1.y + player1.height/2 ||
+        this.x > player2.x - player2.width && this.y > player2.y - player2.height/2 && this.y < player2.y + player2.height/2) {
+      this.xSpeed *= -1;
+    }
+    
+    if (this.x < 0 || this.x > width) {
+      this.x = width/2;
+      this.y = height/2;
+      this.xSpeed = random(2, 3) * (random() > 0.5 ? 1 : -1);
+      this.ySpeed = random(1, 2) * (random() > 0.5 ? 1 : -1);
+    }
+  }
+  
+  checkPlayerCollision(player) {
+    if (this.x < player.x + player.width && this.y > player.y - player.height/2 && this.y < player.y + player.height/2) {
+      this.xSpeed *= -1;
+    }
+  }
+}
